@@ -228,8 +228,9 @@ endfunction
 " clear stl of other windows
 function! s:clearNonBottom()
     let bg2 = '%#'.s:nonbtbg.'#'
-    for w in s:nonbottom
-        call setwinvar(w, '&stl', bg2.repeat(' ', 9))
+    for wid in s:nonbottom
+        " to avoid fillchars
+        call setwinvar(wid, '&stl', bg2.repeat(' ', winwidth(wid)))
     endfor
 endfunction
 
