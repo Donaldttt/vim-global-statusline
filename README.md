@@ -29,9 +29,37 @@ function! s:fnstr()
     call stl#setStl()
 endfunction
 
+
+" extension that adds mode information"
+function! s:modestr()
+    let m = mode()
+    if m == 'n'
+        call stl#setVirtualStl(0, ' NORMAL ', 'StatusLineTerm', 'mode')
+    elseif m == 'i'
+        call stl#setVirtualStl(0, ' INSERT ', 'SpellRare', 'mode')
+    elseif m == 'v'
+        call stl#setVirtualStl(0, ' VISUAL ', 'SpellCap', 'mode')
+    elseif m == 'V'
+        call stl#setVirtualStl(0, ' V-LINE ', 'Visual', 'mode')
+    elseif m == '^V'
+        call stl#setVirtualStl(0, ' V-BLOCK ', 'CurSearch', 'mode')
+    endif
+    call stl#setStl()
+endfunction
+
+" extension adds line column information
+function! s:lncol()
+    let col = virtcol(".")
+    let ln = line('.')
+    call stl#setVirtualStl(float2nr(&co * 0.9), ln.':'.col, '', 'linenr')
+    call stl#setStl()
+endfunction
+
 augroup GlobalStl
     autocmd!
+    autocmd VimEnter,ModeChanged * call s:modestr()
     autocmd BufEnter * call s:fnstr()
+    autocmd CursorMoved * call s:lncol()
 augroup END
 ```
 
