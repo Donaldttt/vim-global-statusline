@@ -100,7 +100,7 @@ function! s:addToWinStl(start, content, hi)
 
             let used = s:winstls[w['winid']]['used']
 
-            let width = len(a:content)
+            let width = strcharlen(a:content)
             if a:start + width <= winend
 
                 let padstr = [hi, a:content]
@@ -115,30 +115,34 @@ function! s:addToWinStl(start, content, hi)
 
                     let last = remove(s:winstls[w['winid']]['content'], -1)
 
-                    if len(last) > 2 && last[0:1] != '%#' && len(last) >= overlap
-                        let last = last[0:-overlap - 1]
+                    let l = strcharlen(last)
+                    if l > 2 && last[0:1] != '%#' && l >= overlap
+                        let last = strcharpart(last, 0, l - overlap)
                         call add(s:winstls[w['winid']]['content'], last)
                         let s:winstls[w['winid']]['used'] -= overlap
                         break
                     else
-                        if len(last) > 2 && last[0:1] == '%#'
+                        if l > 2 && last[0:1] == '%#'
                             continue
                         else
-                            let overlap -= len(last)
+                            let overlap -= l 
                         endif
                     endif
                 endwhile
 
                 let s:winstls[w['winid']]['content'] += padstr
 
-                let s:winstls[w['winid']]['used'] += len(a:content) + pad
+                let s:winstls[w['winid']]['used'] += strcharlen(a:content) + pad
 
             else
 
                 " need to split
-                let first = a:content[0:winend - a:start - 1]
-                let special = a:content[winend - a:start]
-                let second = a:content[winend - a:start + 1:]
+                " let first = a:content[0:winend - a:start - 1]
+                " let special = a:content[winend - a:start]
+                " let second = a:content[winend - a:start + 1:]
+                let first = strcharpart(a:content, 0, winend - a:start)
+                let special = strcharpart(a:content, winend - a:start, 1)
+                let second = strcharpart(a:content, winend - a:start + 1)
 
                 let s:winstls[w['winid']]['special'] = special
                 let s:winstls[w['winid']]['specialhi'] = a:hi != '' ? a:hi : ''
