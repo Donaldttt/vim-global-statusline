@@ -175,13 +175,13 @@ function! s:applyStls()
 
     let cterm = has_key(hi, 'cterm') != '' ? hi['cterm'] : 'NONE'
 
-    if hi['guibg'] != '' && has('termguicolors')
+    if has_key(hi, 'guibg') && hi['guibg'] != '' && has('termguicolors')
         " ctermbg of these two are set differently to avoid fillchars, same
         " for bleow
         let guifg = has_key(hi, 'guifg') != '' ? hi['guifg'] : 'NONE'
         exe 'hi! Statusline guibg='.hi['guibg'].' ctermbg=33 guifg='.guifg.' cterm='.cterm
         exe 'hi! StatuslineNC guibg='.hi['guibg'].' ctermbg=44 guifg='.guifg.' cterm='.cterm
-    elseif hi['ctermbg'] != ''
+    elseif has_key(hi, 'ctermbg') && hi['ctermbg'] != ''
         let ctermfg = has_key(hi, 'ctermfg') != '' ? hi['ctermfg'] : 'NONE'
         exe 'hi! Statusline guibg=#ffffff ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
         exe 'hi! StatuslineNC guibg=#111111 ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
