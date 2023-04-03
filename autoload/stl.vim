@@ -105,9 +105,6 @@ function! s:addToWinStl(start, content, hi, ...)
 
             if a:start + width <= winend
 
-" TODO fix stl is push left when open nerdtree, the last argument is an
-" attempt
-
                 " let used = len(s:winstls[w['winid']]['content'])
                 let padstr = hi. a:content
                 let pad = a:start - (w['start'] + used) - 1
@@ -143,24 +140,40 @@ function! s:addToWinStl(start, content, hi, ...)
             break
         endif
     endfor
+
 endfunction
 
-function! s:getHiTerm(group, term)
-   let output = execute('hi ' . a:group)
-   return matchstr(output, a:term.'=\zs\S*')
+function! s:getHiTerm(group)
+  let output = execute('hi ' . a:group)
+  let list = split(output, '\s\+')
+  let dict = {}
+  for item in list
+    if match(item, '=') > 0
+      let splited = split(item, '=')
+      let dict[splited[0]] = splited[1]
+    endif
+  endfor
+  return dict
 endfunction
 
 function! s:applyStls()
-    let guibg = s:getHiTerm(s:bg, 'guibg')
-    let ctermbg = s:getHiTerm(s:bg, 'ctermbg')
+    let hi = s:getHiTerm(s:bg)
 
-    if guibg != ''
-        exe 'hi! Statusline guibg='.guibg
-        exe 'hi! StatuslineNC guibg='.guibg
-    elseif ctermbg != ''
-        exe 'hi! Statusline ctermbg='.ctermbg
-        exe 'hi! StatuslineNC ctermbg='.ctermbg
+    let cterm = has_key(hi, 'cterm') != '' ? hi['cterm'] : 'NONE'
+    
+     
+    if hi['guibg'] != '' && has('termguicolors')
+        " ctermbg of these two are set differently to avoid fillchars, same
+        " for bleow
+        let guifg = has_key(hi, 'guifg') != '' ? hi['guifg'] : 'NONE'
+        exe 'hi! Statusline guibg='.hi['guibg'].' ctermbg=33 guifg='.guifg.' cterm='.cterm
+        exe 'hi! StatuslineNC guibg='.hi['guibg'].' ctermbg=44 guifg='.guifg.' cterm='.cterm
+    elseif hi['ctermbg'] != ''
+        let ctermfg = has_key(hi, 'ctermfg') != '' ? hi['ctermfg'] : 'NONE'
+        exe 'hi! Statusline guibg=#ffffff ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
+        exe 'hi! StatuslineNC guibg=#111111 ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
     endif
+
     for [wid, v] in items(s:winstls)
         let content = v['content']
         let used = v['used']
@@ -172,32 +185,18 @@ function! s:applyStls()
 
         if special != ''
             if wid == s:activewin
-                call setwinvar(wid, '&fillchars', 'stl:' . special)
+                call setwinvar(wid, '&fillchars', g:saved_fillchars.'stl:' . special)
                 if specialhi != ''
                     exe 'hi! link Statusline '.specialhi
-                else
-                    " exe 'hi! link Statusline '.s:bg
-                    if guibg != ''
-                        exe 'hi! Statusline guibg='.guibg
-                    elseif ctermbg != ''
-                        exe 'hi! Statusline ctermbg='.ctermbg
-                    endif
                 endif
             else
-                call setwinvar(wid, '&fillchars', 'stlnc:' . special)
+                call setwinvar(wid, '&fillchars', g:saved_fillchars.'stlnc:' . special)
                 if specialhi != ''
                     exe 'hi! link StatuslineNC '.specialhi
-                else
-                    " exe 'hi! link StatuslineNC '.s:bg
-                    if guibg != ''
-                        exe 'hi! StatuslineNC guibg='.guibg
-                    elseif ctermbg != ''
-                        exe 'hi! StatuslineNC ctermbg='.ctermbg
-                    endif
                 endif
             endif
         else
-            call setwinvar(wid, '&fillchars', 'stlnc: ,stl: ,')
+            call setwinvar(wid, '&fillchars', g:saved_fillchars.'stlnc: ,stl: ,')
         endif
 
         if used < width
@@ -247,7 +246,6 @@ function! stl#setStl()
     let s:winstls = {}
     for w in s:curwins
 
-        " call setwinvar(w['winid'], '&stl', '')
         let s:winstls[w['winid']] = {
             \ 'content': '',
             \ 'used': 0,
