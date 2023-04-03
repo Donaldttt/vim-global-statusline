@@ -54,7 +54,8 @@ function! stl#getStlInfo()
         let obj = {}
         let obj['winid'] = w
         let obj['width'] = winwidth(w)
-        let obj['start'] = idx > 0 ? start - 1 : start
+        " let obj['start'] = idx > 0 ? start - 1 : start
+        let obj['start'] = start
         let start += obj['width'] + 1
         let retobjs += [obj]
         let idx += 1
@@ -89,53 +90,62 @@ function! stl#setVirtualStl(start, content, highlight, id)
     call sort(s:virtualstl_list, 's:sorter')
 endfunction
 
-function! s:addToWinStl(start, content, hi, ...)
-    let width = len(a:content)
+function! s:addToWinStl(start, content, hi)
     let hi = a:hi != '' ? '%#'.a:hi.'#' : ''
     let bg = '%#'.s:bg.'#'
     for w in s:curwins
 
         let winend = w['start'] + w['width']
-        if w['start'] <= a:start && a:start <=  winend
+        if w['start'] <= a:start && a:start <= winend
 
-            " if a:0 > 0
-            "     let s:winstls[w['winid']]['used'] += a:1
-            " endif
             let used = s:winstls[w['winid']]['used']
 
+            let width = len(a:content)
             if a:start + width <= winend
 
-                " let used = len(s:winstls[w['winid']]['content'])
-                let padstr = hi. a:content
-                let pad = a:start - (w['start'] + used) - 1
+                let padstr = [hi, a:content]
+                let pad = a:start - (w['start'] + used) > 0 ? a:start - (w['start'] + used) : 0
                 if pad > 0
-                    let padstr = bg.repeat(' ', pad) . padstr
+                    let padstr = [bg, repeat(' ', pad)] + padstr
                 endif
-                let s:winstls[w['winid']]['content'] .= padstr
 
-                let s:winstls[w['winid']]['used'] += len(a:content)
+                let overlap = (w['start'] + used) - a:start
+                while overlap > 0
+                " overlapping
+
+                    let last = remove(s:winstls[w['winid']]['content'], -1)
+
+                    if len(last) > 2 && last[0:1] != '%#' && len(last) >= overlap
+                        let last = last[0:-overlap - 1]
+                        call add(s:winstls[w['winid']]['content'], last)
+                        let s:winstls[w['winid']]['used'] -= overlap
+                        break
+                    else
+                        if len(last) > 2 && last[0:1] == '%#'
+                            continue
+                        else
+                            let overlap -= len(last)
+                        endif
+                    endif
+                endwhile
+
+                let s:winstls[w['winid']]['content'] += padstr
+
+                let s:winstls[w['winid']]['used'] += len(a:content) + pad
 
             else
 
                 " need to split
-                let first = a:content[0:winend - a:start]
-                let special = a:content[winend - a:start + 1]
-                let second = a:content[winend - a:start + 2:]
-                let s:winstls[w['winid']]['special'] = special
+                let first = a:content[0:winend - a:start - 1]
+                let special = a:content[winend - a:start]
+                let second = a:content[winend - a:start + 1:]
 
+                let s:winstls[w['winid']]['special'] = special
                 let s:winstls[w['winid']]['specialhi'] = a:hi != '' ? a:hi : ''
 
-                let padstr = hi . first
-                let pad = a:start - (w['start'] + used) - 1
-                if pad > 0
-                    let padstr = bg.repeat(' ', pad) . padstr
-                endif
+                call s:addToWinStl(a:start, first, a:hi)
 
-                let s:winstls[w['winid']]['content'] .= padstr
-
-                let s:winstls[w['winid']]['used'] += len(first)
-
-                call s:addToWinStl(winend + 1, second, a:hi, 1)
+                call s:addToWinStl(winend + 1, second, a:hi)
             endif
             break
         endif
@@ -160,8 +170,7 @@ function! s:applyStls()
     let hi = s:getHiTerm(s:bg)
 
     let cterm = has_key(hi, 'cterm') != '' ? hi['cterm'] : 'NONE'
-    
-     
+
     if hi['guibg'] != '' && has('termguicolors')
         " ctermbg of these two are set differently to avoid fillchars, same
         " for bleow
@@ -181,7 +190,7 @@ function! s:applyStls()
         let special = v['special']
         let specialhi = v['specialhi']
         let bgstr = '%#'.s:bg.'#'
-        let stl = bgstr.content.bgstr
+        let stl = bgstr.join(content, '').bgstr
 
         if special != ''
             if wid == s:activewin
@@ -246,9 +255,8 @@ function! stl#setStl()
     let s:nonbottom = li[1]
     let s:winstls = {}
     for w in s:curwins
-
         let s:winstls[w['winid']] = {
-            \ 'content': '',
+            \ 'content': [],
             \ 'used': 0,
             \ 'width': w['width'],
             \ 'special': '',
