@@ -1,4 +1,4 @@
-# vim-globalstl
+# vim-global-statusline
 
 A plugin implements a global statusline(like the one in neovim) in vim.
 
