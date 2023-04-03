@@ -4,8 +4,9 @@ let s:virtualstl_list = []
 let s:curwins = []
 let s:winstls = {}
 let s:activewin = 0
-let s:bg = 'IncSearch'
+let s:bg = g:stl_bg
 let s:nonbottom = []
+let s:nonbtbg = g:stl_nonbtbg
 
 " get winid of windows at the bottom of the screen
 function! stl#getStlInfo()
@@ -47,13 +48,16 @@ function! stl#getStlInfo()
 
     let retobjs = []
     let start = 0
+
+    let idx = 0
     for w in left2right
         let obj = {}
         let obj['winid'] = w
         let obj['width'] = winwidth(w)
-        let obj['start'] = start
+        let obj['start'] = idx > 0 ? start - 1 : start
         let start += obj['width'] + 1
         let retobjs += [obj]
+        let idx += 1
     endfor
     return [retobjs, s:nonbombom]
 endfunction
@@ -85,7 +89,7 @@ function! stl#setVirtualStl(start, content, highlight, id)
     call sort(s:virtualstl_list, 's:sorter')
 endfunction
 
-function! s:addToWinStl(start, content, hi)
+function! s:addToWinStl(start, content, hi, ...)
     let width = len(a:content)
     let hi = a:hi != '' ? '%#'.a:hi.'#' : ''
     let bg = '%#'.s:bg.'#'
@@ -94,9 +98,15 @@ function! s:addToWinStl(start, content, hi)
         let winend = w['start'] + w['width']
         if w['start'] <= a:start && a:start <=  winend
 
+            " if a:0 > 0
+            "     let s:winstls[w['winid']]['used'] += a:1
+            " endif
             let used = s:winstls[w['winid']]['used']
 
             if a:start + width <= winend
+
+" TODO fix stl is push left when open nerdtree, the last argument is an
+" attempt
 
                 " let used = len(s:winstls[w['winid']]['content'])
                 let padstr = hi. a:content
@@ -107,6 +117,7 @@ function! s:addToWinStl(start, content, hi)
                 let s:winstls[w['winid']]['content'] .= padstr
 
                 let s:winstls[w['winid']]['used'] += len(a:content)
+
             else
 
                 " need to split
@@ -127,7 +138,7 @@ function! s:addToWinStl(start, content, hi)
 
                 let s:winstls[w['winid']]['used'] += len(first)
 
-                call s:addToWinStl(winend + 1, second, a:hi)
+                call s:addToWinStl(winend + 1, second, a:hi, 1)
             endif
             break
         endif
@@ -146,7 +157,7 @@ function! s:applyStls()
     if guibg != ''
         exe 'hi! Statusline guibg='.guibg
         exe 'hi! StatuslineNC guibg='.guibg
-    else
+    elseif ctermbg != ''
         exe 'hi! Statusline ctermbg='.ctermbg
         exe 'hi! StatuslineNC ctermbg='.ctermbg
     endif
@@ -168,7 +179,7 @@ function! s:applyStls()
                     " exe 'hi! link Statusline '.s:bg
                     if guibg != ''
                         exe 'hi! Statusline guibg='.guibg
-                    else
+                    elseif ctermbg != ''
                         exe 'hi! Statusline ctermbg='.ctermbg
                     endif
                 endif
@@ -180,7 +191,7 @@ function! s:applyStls()
                     " exe 'hi! link StatuslineNC '.s:bg
                     if guibg != ''
                         exe 'hi! StatuslineNC guibg='.guibg
-                    else
+                    elseif ctermbg != ''
                         exe 'hi! StatuslineNC ctermbg='.ctermbg
                     endif
                 endif
@@ -217,7 +228,7 @@ endfunction
 
 " clear stl of other windows
 function! s:clearNonBottom()
-    let bg2 = '%#Folded#'
+    let bg2 = '%#'.s:nonbtbg.'#'
     for w in s:nonbottom
         call setwinvar(w, '&stl', bg2.repeat(' ', 9))
     endfor
