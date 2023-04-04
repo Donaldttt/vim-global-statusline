@@ -2,7 +2,7 @@
 
 A plugin implements a global statusline(like the one in neovim) in vim.
 
-(need vim9 with patch 9.0.0036, check using `:echo has('patch36')`. Without it characters at win split positions will be blocked)
+(needs vim9 with patch 9.0.0036 to work perfectly, check using `:echo has('patch36')`. For other vim version the characters at win split positions on statusline will be blocked)
 
 ## Options
 
