@@ -181,10 +181,16 @@ function! s:applyStls()
         let guifg = has_key(hi, 'guifg') != '' ? hi['guifg'] : 'NONE'
         exe 'hi! Statusline guibg='.hi['guibg'].' ctermbg=33 guifg='.guifg.' cterm='.cterm
         exe 'hi! StatuslineNC guibg='.hi['guibg'].' ctermbg=44 guifg='.guifg.' cterm='.cterm
+
+        exe 'hi! StatuslineTerm guibg='.hi['guibg'].' ctermbg=33 guifg='.guifg.' cterm='.cterm
+        exe 'hi! StatuslineTermNC guibg='.hi['guibg'].' ctermbg=44 guifg='.guifg.' cterm='.cterm
     elseif has_key(hi, 'ctermbg') && hi['ctermbg'] != ''
         let ctermfg = has_key(hi, 'ctermfg') != '' ? hi['ctermfg'] : 'NONE'
         exe 'hi! Statusline guibg=#ffffff ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
         exe 'hi! StatuslineNC guibg=#111111 ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
+
+        exe 'hi! StatuslineTerm guibg=#ffffff ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
+        exe 'hi! StatuslineTermNC guibg=#111111 ctermbg='.hi['ctermbg'].' ctermfg='.ctermfg.' cterm='.cterm
     endif
 
     for [wid, v] in items(s:winstls)
