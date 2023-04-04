@@ -125,7 +125,7 @@ function! s:addToWinStl(start, content, hi)
                         if l > 2 && last[0:1] == '%#'
                             continue
                         else
-                            let overlap -= l 
+                            let overlap -= l
                         endif
                     endif
                 endwhile
@@ -234,7 +234,10 @@ endfunction
 function! stl#init()
     augroup globalstl
         autocmd!
-        autocmd WinEnter,WinResized,WinNew * call stl#setStl()
+        autocmd WinEnter,WinNew * call stl#setStl()
+        if exists('##winresized')
+            autocmd WinResized * call stl#setStl()
+        endif
     augroup END
 endfunction
 
@@ -250,6 +253,7 @@ endfunction
 function! stl#getNonbot()
     return s:nonbottom
 endfunction
+
 function! stl#setStl()
 
     let s:activewin = win_getid()
