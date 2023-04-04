@@ -204,11 +204,13 @@ def ApplyStls(): void
                 setwinvar(wid, '&fillchars', g:saved_fillchars .. 'stl:' .. special)
                 if specialhi != ''
                     exe 'hi! link Statusline ' .. specialhi
+                    exe 'hi! link StatuslineTerm ' .. specialhi
                 endif
             else
                 setwinvar(wid, '&fillchars', g:saved_fillchars .. 'stlnc:' .. special)
                 if specialhi != ''
                     exe 'hi! link StatuslineNC ' .. specialhi
+                    exe 'hi! link StatuslineTermNC ' .. specialhi
                 endif
             endif
         else
