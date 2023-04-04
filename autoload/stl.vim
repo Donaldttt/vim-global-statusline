@@ -1,5 +1,4 @@
 
-
 function! stl#setStl()
     " call SetStl()
     call g:stl_funcs['SetStl']()

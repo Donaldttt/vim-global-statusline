@@ -88,8 +88,8 @@ export def SetVirtualStl(start: number, content: string, highlight: string, id: 
 enddef
 
 def AddToWinStl(_start: number, _content: string, _chi: string): void
-	var Wrapper: func(number, string, string)
-Wrapper = (start: number, content: string, chi: string) => {
+    var Wrapper: func(number, string, string)
+    Wrapper = (start: number, content: string, chi: string) => {
     var hi = chi != '' ? '%#' .. chi .. '#' : ''
     var bgstr = '%#' .. defaultbg .. '#'
     for w in curwins
@@ -148,9 +148,8 @@ Wrapper = (start: number, content: string, chi: string) => {
             break
         endif
     endfor
-   }
-Wrapper(_start, _content, _chi)
-
+    }
+    Wrapper(_start, _content, _chi)
 enddef
 
 

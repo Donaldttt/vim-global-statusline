@@ -1,11 +1,12 @@
 vim9script
 
-#if get(g:, 'global_stl_loaded', 0) == 1
-#    finish
-#endif
+if get(g:, 'global_stl_loaded', 0) == 1
+    finish
+endif
+
+set laststatus=2
 
 g:global_stl_loaded = 1
-
 g:stl_nonbtbg = get(g:, 'stl_nonbtbg', 'folded')
 g:stl_bg = get(g:, 'stl_bg', 'folded')
 
@@ -14,13 +15,11 @@ if g:saved_fillchars[-1 : -1] != ','
     g:saved_fillchars .= ','
 endif
 
-set laststatus=2
-
 import autoload 'stl9.vim'
 
-g:stl_funcs = {}
-g:stl_funcs['SetStl'] = function(stl9.SetStl)
-g:stl_funcs['SetVirtualStl'] = function(stl9.SetVirtualStl)
+g:StlSetPart = stl9.SetVirtualStl
+g:StlRefresh = stl9.SetStl
+
 def Init()
     augroup globalstl
         autocmd!
@@ -31,7 +30,6 @@ def Init()
     augroup END
 enddef
 
+
 Init()
-
-
 
