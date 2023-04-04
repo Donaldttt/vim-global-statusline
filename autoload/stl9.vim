@@ -174,17 +174,19 @@ def ApplyStls(): void
         # ctermbg of these two are set differently to avoid fillchars, same
         # for bleow
         var guifg = has_key(hi, 'guifg') ? hi['guifg'] : 'NONE'
-        exe 'hi! Statusline guibg=' .. hi['guibg']
-            .. ' ctermbg=33 guifg=' .. guifg .. ' cterm=' .. cterm
+        exe 'hi! Statusline guibg=' .. hi['guibg'] .. ' ctermbg=33 guifg=' .. guifg .. ' cterm=' .. cterm
+        exe 'hi! StatuslineNC guibg=' .. hi['guibg'] .. ' ctermbg=44 guifg=' .. guifg .. ' cterm=' .. cterm
 
-        exe 'hi! StatuslineNC guibg=' .. hi['guibg']
-            .. ' ctermbg=44 guifg=' .. guifg .. ' cterm=' .. cterm
+        exe 'hi! StatuslineTerm guibg=' .. hi['guibg'] .. ' ctermbg=33 guifg=' .. guifg .. ' cterm=' .. cterm
+        exe 'hi! StatuslineTermNC guibg=' .. hi['guibg'] .. ' ctermbg=44 guifg=' .. guifg .. ' cterm=' .. cterm
+
     elseif has_key(hi, 'ctermbg') && hi['ctermbg'] != ''
         var ctermfg = has_key(hi, 'ctermfg') ? hi['ctermfg'] : 'NONE'
-        exe 'hi! Statusline guibg=#ffffff ctermbg='
-            .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
-        exe 'hi! StatuslineNC guibg=#111111 ctermbg='
-            .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
+        exe 'hi! Statusline guibg=#ffffff ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
+        exe 'hi! StatuslineNC guibg=#111111 ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
+
+        exe 'hi! StatuslineTerm guibg=#ffffff ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
+        exe 'hi! StatuslineTermNC guibg=#111111 ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
     endif
 
     for [_wid, v] in items(winstls)

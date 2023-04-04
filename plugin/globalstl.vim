@@ -20,16 +20,13 @@ import autoload 'stl9.vim'
 g:StlSetPart = stl9.SetVirtualStl
 g:StlRefresh = stl9.SetStl
 
-def Init()
-    augroup globalstl
-        autocmd!
-        autocmd WinEnter,WinNew * call stl9.SetStl()
-        if exists('##winresized')
-            autocmd WinResized * call stl9.SetStl()
-        endif
-    augroup END
-enddef
+augroup globalstl
+    autocmd!
+    autocmd WinEnter,WinNew * call stl9.SetStl()
+    if exists('##winresized')
+        autocmd WinResized * call stl9.SetStl()
+    endif
+augroup END
 
 
-Init()
 
