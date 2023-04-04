@@ -13,3 +13,5 @@ if g:saved_fillchars[-1:-1] != ','
 endif
 
 set laststatus=2
+
+call stl#init()
