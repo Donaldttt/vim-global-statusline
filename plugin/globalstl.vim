@@ -12,6 +12,9 @@ if g:saved_fillchars[-1:-1] != ','
     let g:saved_fillchars .= ','
 endif
 
+let g:StlSetPart = function('stl#setVirtualStl')
+let g:StlRefresh = function('stl#setStl')
+
 set laststatus=2
 
 call stl#init()
