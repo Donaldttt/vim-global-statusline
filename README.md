@@ -17,8 +17,8 @@ let g:stl_bg = 'FoldColumn'
 
 ## Usage
 
-To add extensions to status line, you need to call `stl#setVirtualStl(start_column, content, highlight, extension_name)`,
-`extension_name` are used to identify the extensions internaly. And then call `stl#setStl()` to update statusline.
+To add extensions to status line, you need to call `StlSetPart(start_column, content, highlight, extension_name)`,
+`extension_name` are used to identify the extensions internaly. And then call `StlRefresh()` to update statusline.
 
 Currently this function only accept raw string as content.
 
@@ -27,8 +27,8 @@ you can use autocmd to update the content of statusline in real time.
 ```vim
 " a simple extension display the buffer name of current buffer
 function! s:fnstr()
-    call stl#setVirtualStl(10, 'filename: '.bufname(), '', 'filename')
-    call stl#setStl()
+    call StlSetPart(10, 'filename: '.bufname(), '', 'filename')
+    call StlRefresh()
 endfunction
 
 
@@ -36,25 +36,25 @@ endfunction
 function! s:modestr()
     let m = mode()
     if m == 'n'
-        call stl#setVirtualStl(0, ' NORMAL ', 'StatusLineTerm', 'mode')
+        call StlSetPart(0, ' NORMAL ', 'StatusLineTerm', 'mode')
     elseif m == 'i'
-        call stl#setVirtualStl(0, ' INSERT ', 'SpellRare', 'mode')
+        call StlSetPart(0, ' INSERT ', 'SpellRare', 'mode')
     elseif m == 'v'
-        call stl#setVirtualStl(0, ' VISUAL ', 'SpellCap', 'mode')
+        call StlSetPart(0, ' VISUAL ', 'SpellCap', 'mode')
     elseif m == 'V'
-        call stl#setVirtualStl(0, ' V-LINE ', 'Visual', 'mode')
+        call StlSetPart(0, ' V-LINE ', 'Visual', 'mode')
     elseif m == '^V'
-        call stl#setVirtualStl(0, ' V-BLOCK ', 'CurSearch', 'mode')
+        call StlSetPart(0, ' V-BLOCK ', 'CurSearch', 'mode')
     endif
-    call stl#setStl()
+    call StlRefresh()
 endfunction
 
 " extension adds line column information
 function! s:lncol()
     let col = virtcol(".")
     let ln = line('.')
-    call stl#setVirtualStl(float2nr(&co * 0.9), ln.':'.col, '', 'linenr')
-    call stl#setStl()
+    call StlSetPart(float2nr(&co * 0.9), ln.':'.col, '', 'linenr')
+    call StlRefresh()
 endfunction
 
 augroup GlobalStl
