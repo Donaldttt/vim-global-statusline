@@ -61,7 +61,7 @@ augroup GlobalStl
     autocmd!
     autocmd VimEnter,ModeChanged * call s:modestr()
     autocmd BufEnter * call s:fnstr()
-    autocmd CursorMoved * call s:lncol()
+    autocmd CursorHold * call s:lncol()
 augroup END
 ```
 
