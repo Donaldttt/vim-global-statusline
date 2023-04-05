@@ -152,65 +152,78 @@ def AddToWinStl(_start: number, _content: string, _chi: string): void
     Wrapper(_start, _content, _chi)
 enddef
 
+var cache: dict<any> = {}
+def ClearCache(): void
+    cache = {}
+enddef
+augroup ClearCache
+    autocmd!
+    autocmd ColorScheme * call ClearCache()
+augroup END
+
+def GetHiTerm(group: string): dict<any>
+    if has_key(cache, group)
+        return cache[group]
+    endif
+    var output = execute('hi ' .. group)
+    var list = split(output, '\s\+')
+    var dict = {}
+
+    for item in list
+        if match(item, '=') > 0
+              var splited = split(item, '=')
+              dict[splited[0]] = splited[1]
+        endif
+    endfor
+    cache[group] = dict
+    return dict
+enddef
+
+def CopyHi(hiname: string, terms: dict<any>): void
+    var str = 'hi! ' .. hiname
+    if has_key(terms, 'guifg')
+        str ..= ' guifg=' .. terms['guifg']
+    endif
+    if has_key(terms, 'guibg')
+        str ..= ' guibg=' .. terms['guibg']
+    endif
+    if has_key(terms, 'gui')
+        str ..= ' gui=' .. terms['gui']
+    endif
+    if has_key(terms, 'ctermfg')
+        str ..= ' ctermfg=' .. terms['ctermfg']
+    endif
+    if has_key(terms, 'ctermbg')
+        str ..= ' ctermbg=' .. terms['ctermbg']
+    endif
+    if has_key(terms, 'cterm')
+        str ..= ' cterm=' .. terms['cterm']
+    endif
+    execute(str)
+enddef
+
+var defaultHi: dict<any> = GetHiTerm(defaultbg)
 
 def ApplyStls(): void
-    def GetHiTerm(group: string): dict<any>
-      var output = execute('hi ' .. group)
-      var list = split(output, '\s\+')
-      var dict = {}
 
-      for item in list
-        if match(item, '=') > 0
-          var splited = split(item, '=')
-          dict[splited[0]] = splited[1]
-        endif
-      endfor
-      return dict
-    enddef
-    def CopyHi(hiname: string, terms: dict<any>): void
-        var str = 'hi! ' .. hiname
-        if has_key(terms, 'guifg')
-            str ..= ' guifg=' .. terms['guifg']
-        endif
-        if has_key(terms, 'guibg')
-            str ..= ' guibg=' .. terms['guibg']
-        endif
-        if has_key(terms, 'gui')
-            str ..= ' gui=' .. terms['gui']
-        endif
-        if has_key(terms, 'ctermfg')
-            str ..= ' ctermfg=' .. terms['ctermfg']
-        endif
-        if has_key(terms, 'ctermbg')
-            str ..= ' ctermbg=' .. terms['ctermbg']
-        endif
-        if has_key(terms, 'cterm')
-            str ..= ' cterm=' .. terms['cterm']
-        endif
-        execute(str)
-    enddef
 
-    var hi = GetHiTerm(defaultbg)
-
-    # var cterm = has_key(hi, 'cterm') ? hi['cterm'] : 'NONE'
-    if has_key(hi, 'guibg') && hi['guibg'] != '' && has('termguicolors')
+    if has('termguicolors')
         # ctermbg of these two are set differently to avoid fillchars, same
         # for bleow
-        hi['ctermbg'] = 33
-        CopyHi('Statusline', hi)
-        CopyHi('StatuslineTerm', hi)
-        hi['ctermbg'] = 34
-        CopyHi('StatuslineNC', hi)
-        CopyHi('StatuslineTermNC', hi)
+        defaultHi['ctermbg'] = 33
+        CopyHi('Statusline', defaultHi)
+        CopyHi('StatuslineTerm', defaultHi)
+        defaultHi['ctermbg'] = 34
+        CopyHi('StatuslineNC', defaultHi)
+        CopyHi('StatuslineTermNC', defaultHi)
 
-    elseif has_key(hi, 'ctermbg') && hi['ctermbg'] != ''
-        # var ctermfg = has_key(hi, 'ctermfg') ? hi['ctermfg'] : 'NONE'
-        hi['guibg'] = '#ffffff'
-        CopyHi('Statusline', hi)
-        CopyHi('StatuslineTerm', hi)
-        hi['guibg'] = '#111111'
-        CopyHi('StatuslineNC', hi)
-        CopyHi('StatuslineTermNC', hi)
+    else
+        defaultHi['guibg'] = '#ffffff'
+        CopyHi('Statusline', defaultHi)
+        CopyHi('StatuslineTerm', defaultHi)
+        defaultHi['guibg'] = '#111111'
+        CopyHi('StatuslineNC', defaultHi)
+        CopyHi('StatuslineTermNC', defaultHi)
     endif
 
     for [_wid, v] in items(winstls)
