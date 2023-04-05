@@ -209,8 +209,10 @@ enddef
 
 # clear stl of other windows
 def ClearNonBottom(nonbottom: list<any>): void
+    const fillcharsstr = savedfillchars .. 'stlnc: ,stl: ,'
     for wid in nonbottom  # to avoid fillchars
-        call setwinvar(wid, '&stl', nonbtbgstr)
+        setwinvar(wid, '&stl', nonbtbgstr)
+        setwinvar(wid, '&fillchars', fillcharsstr)
     endfor
 enddef
 
