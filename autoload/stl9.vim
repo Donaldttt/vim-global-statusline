@@ -167,50 +167,86 @@ def ApplyStls(): void
       endfor
       return dict
     enddef
-    var hi = GetHiTerm(defaultbg)
-    var cterm = has_key(hi, 'cterm') ? hi['cterm'] : 'NONE'
+    def CopyHi(hiname: string, terms: dict<any>): void
+        var str = 'hi! ' .. hiname
+        if has_key(terms, 'guifg')
+            str ..= ' guifg=' .. terms['guifg']
+        endif
+        if has_key(terms, 'guibg')
+            str ..= ' guibg=' .. terms['guibg']
+        endif
+        if has_key(terms, 'gui')
+            str ..= ' gui=' .. terms['gui']
+        endif
+        if has_key(terms, 'ctermfg')
+            str ..= ' ctermfg=' .. terms['ctermfg']
+        endif
+        if has_key(terms, 'ctermbg')
+            str ..= ' ctermbg=' .. terms['ctermbg']
+        endif
+        if has_key(terms, 'cterm')
+            str ..= ' cterm=' .. terms['cterm']
+        endif
+        execute(str)
+    enddef
 
+    var hi = GetHiTerm(defaultbg)
+
+    # var cterm = has_key(hi, 'cterm') ? hi['cterm'] : 'NONE'
     if has_key(hi, 'guibg') && hi['guibg'] != '' && has('termguicolors')
         # ctermbg of these two are set differently to avoid fillchars, same
         # for bleow
-        var guifg = has_key(hi, 'guifg') ? hi['guifg'] : 'NONE'
-        exe 'hi! Statusline guibg=' .. hi['guibg'] .. ' ctermbg=33 guifg=' .. guifg .. ' cterm=' .. cterm
-        exe 'hi! StatuslineNC guibg=' .. hi['guibg'] .. ' ctermbg=44 guifg=' .. guifg .. ' cterm=' .. cterm
-
-        exe 'hi! StatuslineTerm guibg=' .. hi['guibg'] .. ' ctermbg=33 guifg=' .. guifg .. ' cterm=' .. cterm
-        exe 'hi! StatuslineTermNC guibg=' .. hi['guibg'] .. ' ctermbg=44 guifg=' .. guifg .. ' cterm=' .. cterm
+        hi['ctermbg'] = 33
+        CopyHi('Statusline', hi)
+        CopyHi('StatuslineTerm', hi)
+        hi['ctermbg'] = 34
+        CopyHi('StatuslineNC', hi)
+        CopyHi('StatuslineTermNC', hi)
 
     elseif has_key(hi, 'ctermbg') && hi['ctermbg'] != ''
-        var ctermfg = has_key(hi, 'ctermfg') ? hi['ctermfg'] : 'NONE'
-        exe 'hi! Statusline guibg=#ffffff ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
-        exe 'hi! StatuslineNC guibg=#111111 ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
-
-        exe 'hi! StatuslineTerm guibg=#ffffff ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
-        exe 'hi! StatuslineTermNC guibg=#111111 ctermbg=' .. hi['ctermbg'] .. ' ctermfg=' .. ctermfg .. ' cterm=' .. cterm
+        # var ctermfg = has_key(hi, 'ctermfg') ? hi['ctermfg'] : 'NONE'
+        hi['guibg'] = '#ffffff'
+        CopyHi('Statusline', hi)
+        CopyHi('StatuslineTerm', hi)
+        hi['guibg'] = '#111111'
+        CopyHi('StatuslineNC', hi)
+        CopyHi('StatuslineTermNC', hi)
     endif
 
     for [_wid, v] in items(winstls)
-        var content = v['content']
-        var used = v['used']
-        var width = v['width']
-        var special = v['special']
-        var specialhi = v['specialhi']
-        var bgstr = '%#' .. defaultbg .. '#'
-        var stl = bgstr .. join(content, '') .. bgstr
-        var wid = str2nr(_wid)
+        var content: list<string> = v['content']
+        var special: string = v['special']
+        var specialhi: string = v['specialhi']
+        var bgstr: string = '%#' .. defaultbg .. '#'
+        var stl: string = bgstr .. join(content, '') .. bgstr
+        var wid: number = str2nr(_wid)
+
+        var specialHiTerm = GetHiTerm(specialhi)
 
         if special != ''
             if wid == activewin
                 setwinvar(wid, '&fillchars', g:saved_fillchars .. 'stl:' .. special)
                 if specialhi != ''
-                    exe 'hi! link Statusline ' .. specialhi
-                    exe 'hi! link StatuslineTerm ' .. specialhi
+                    var shi = GetHiTerm(specialhi)
+                    if has('termguicolors')
+                        shi['ctermbg'] = 34
+                    else
+                        shi['guibg'] = '#ffffff'
+                    endif
+                    CopyHi('Statusline', shi)
+                    CopyHi('StatuslineTerm', shi)
                 endif
             else
                 setwinvar(wid, '&fillchars', g:saved_fillchars .. 'stlnc:' .. special)
                 if specialhi != ''
-                    exe 'hi! link StatuslineNC ' .. specialhi
-                    exe 'hi! link StatuslineTermNC ' .. specialhi
+                    var shi = GetHiTerm(specialhi)
+                    if has('termguicolors')
+                        shi['ctermbg'] = 44
+                    else
+                        shi['guibg'] = '#111111'
+                    endif
+                    CopyHi('StatuslineNC', shi)
+                    CopyHi('StatuslineTermNC', shi)
                 endif
             endif
         else
