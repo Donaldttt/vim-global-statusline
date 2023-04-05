@@ -22,7 +22,7 @@ g:StlRefresh = stl9.SetStl
 
 augroup globalstl
     autocmd!
-    autocmd WinEnter,WinNew * call stl9.SetStl()
+    autocmd WinEnter,WinNew,BufWinEnter * call stl9.SetStl()
     if exists('##winresized')
         autocmd WinResized * call stl9.SetStl()
     endif

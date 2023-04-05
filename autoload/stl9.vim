@@ -1,12 +1,12 @@
 vim9script
 
-var virtualstl = {}
-var virtualstl_list = []
-
-var stlbg: string = g:stl_bg
-var nonbtbg = g:stl_nonbtbg
-
-const savedfillchars = g:saved_fillchars
+var virtualstl: dict<any>       = {}
+var virtualstl_list: list<any>  = []
+var stlbg: string               = g:stl_bg
+var nonbtbg: string             = g:stl_nonbtbg
+const savedfillchars            = g:saved_fillchars
+const bgstr: string             = '%#' .. stlbg .. '#'
+const nonbtbgstr: string        = '%#' .. nonbtbg .. '#'
 
 var stlFixList = ['guibg', '#ffffff', '#111111']
 if has('termguicolors')
@@ -15,9 +15,9 @@ endif
 
 # get winid of windows at the bottom of the screen
 def GetStlInfo(): list<any>
-    var layout: list<any> = winlayout()
-    var nonbom: list<number> = gettabinfo(tabpagenr())[0]['windows']
-    var start: number = 0
+    var layout: list<any>     = winlayout()
+    var nonbom: list<number>  = gettabinfo(tabpagenr())[0]['windows']
+    var start: number         = 0
     var left2right: list<any> = []
 
     def Healper(li: list<any>): void
@@ -58,26 +58,21 @@ export def SetVirtualStl(start: number, content: string, highlight: string, id: 
             'content': content,
             'hi': highlight
         }
-
     virtualstl_list = virtualstl->values()
     virtualstl_list->sort(function(Sorter))
 enddef
 
 def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>, winstls: dict<any> ): void
-    const bgstr: string = '%#' .. stlbg .. '#'
-    const width = strcharlen(content)
-
-    var padstr: list<any> = []
+    const width: number = strcharlen(content)
+    var padstr: list<string> = [bgstr]
     if chi != ''
         padstr = ['%#' .. chi .. '#']
     endif
     for w in botwins
-        var winend = w['start'] + w['width']
-        var wid = w['winid']
+        var winend: number = w['start'] + w['width']
+        var wid: number = w['winid']
         if w['start'] <= start && start <= winend
-
             var used = winstls[wid]['used']
-
             if start + width <= winend
 
                 padstr += [content, bgstr]
@@ -86,11 +81,11 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
                     padstr = [bgstr, repeat(' ', pad)] + padstr
                 endif
 
-                var overlap = (w['start'] + used) - start
+                var overlap: number = (w['start'] + used) - start
                 while overlap > 0 # overlapping
-                    var last = remove(winstls[wid]['content'], -1)
+                    var last: string = remove(winstls[wid]['content'], -1)
 
-                    var l = strcharlen(last)
+                    var l: number = strcharlen(last)
                     if l > 2 && last[0 : 1] != '%#' && l >= overlap
                         last = strcharpart(last, 0, l - overlap)
                         winstls[wid]['content']->add(last)
@@ -107,9 +102,9 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
                 winstls[wid]['used'] += strcharlen(content) + pad
             else
 
-                var first = strcharpart(content, 0, winend - start)
-                var special = strcharpart(content, winend - start, 1)
-                var second = strcharpart(content, winend - start + 1)
+                var first: string   = strcharpart(content, 0, winend - start)
+                var special: string = strcharpart(content, winend - start, 1)
+                var second: string  = strcharpart(content, winend - start + 1)
 
                 winstls[wid]['special'] = special
                 if chi != ''
@@ -137,9 +132,9 @@ def GetHiTerm(group: string): dict<any>
     if has_key(cache, group)
         return cache[group]
     endif
-    var output = execute('hi ' .. group)
-    var list = split(output, '\s\+')
-    var dict = {}
+    var output: string = execute('hi ' .. group)
+    var list: list<string> = split(output, '\s\+')
+    var dict: dict<any> = {}
 
     for item in list
         if match(item, '=') > 0
@@ -160,11 +155,11 @@ def CopyHi(hiname: string, terms: dict<any>): void
 enddef
 
 def ApplyStls(winstls: dict<any>): void
+    const fillcharsstr = savedfillchars .. 'stlnc: ,stl: ,'
     var activewin = win_getid()
-
     var flag1 = 1
     var flag2 = 1
-    const fillcharsstr = savedfillchars .. 'stlnc: ,stl: ,'
+
     for [_wid, v] in items(winstls)
         var wid: number = str2nr(_wid)
         if has_key(v, 'special')
@@ -207,31 +202,32 @@ def ApplyStls(winstls: dict<any>): void
     endif
 enddef
 
+# var ww: dict<any> = {}
+# def g:ReturnWinstl(): dict<any>
+#     return ww
+# enddef
+
 # clear stl of other windows
 def ClearNonBottom(nonbottom: list<any>): void
-    var nonbtbgstr: string = '%#' .. nonbtbg .. '#'
     for wid in nonbottom  # to avoid fillchars
-        call setwinvar(wid, '&stl', nonbtbgstr .. repeat(' ', winwidth(wid)))
+        call setwinvar(wid, '&stl', nonbtbgstr)
     endfor
 enddef
 
 export def SetStl(): void
-    var li = GetStlInfo()
-
-    var botwins = li[0]
-    var nonbottom = li[1]
-
-    var winstls = {}
+    var [botwins, nonbottom] = GetStlInfo()
+    var winstls: dict<any> = {}
     for w in botwins
         winstls[w['winid']] = {
-             'content': [],
-             'used': 0,
-             'width': w['width'],
-         }
+                 'content': [bgstr],
+                 'used': 0,
+                 'width': w['width'] 
+             }
     endfor
     for obj in virtualstl_list
         AddToWinStl(obj['start'], obj['content'], obj['hi'], botwins, winstls)
     endfor
+
     ApplyStls(winstls)
     ClearNonBottom(nonbottom)
 enddef
