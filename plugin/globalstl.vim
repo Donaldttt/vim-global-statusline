@@ -11,8 +11,8 @@ g:stl_nonbtbg = get(g:, 'stl_nonbtbg', 'folded')
 g:stl_bg = get(g:, 'stl_bg', 'folded')
 
 g:saved_fillchars = &fillchars
-if g:saved_fillchars[-1 : -1] != ','
-    g:saved_fillchars .= ','
+if strcharpart(g:saved_fillchars, strcharlen(g:saved_fillchars) - 1, 1) != ','
+    g:saved_fillchars ..= ','
 endif
 
 import autoload 'stl9.vim'
