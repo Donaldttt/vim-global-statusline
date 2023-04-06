@@ -27,8 +27,8 @@ let g:stl_bg = 'FoldColumn'
 
 ## Usage
 
-To add extensions to status line, you need to call `StlSetPart(start_column, content, highlight, extension_name)`,
-`extension_name` are used to identify the extensions internaly. And then call `StlRefresh()` to update statusline.
+To add extensions to status line, you need to call `g:StlSetPart(start_column, content, highlight, extension_name)`,
+`extension_name` are used to identify the extensions internaly. And then call `g:StlRefresh()` to update statusline.
 
 Currently this function only accept raw string as content.
 
@@ -37,8 +37,8 @@ you can use autocmd to update the content of statusline in real time.
 ```vim
 " a simple extension display the buffer name of current buffer
 function! s:fnstr()
-    call StlSetPart(10, 'filename: '.bufname(), '', 'filename')
-    call StlRefresh()
+    call g:StlSetPart(10, 'filename: '.bufname(), '', 'filename')
+    call g:StlRefresh()
 endfunction
 
 
@@ -46,25 +46,25 @@ endfunction
 function! s:modestr()
     let m = mode()
     if m == 'n'
-        call StlSetPart(0, ' NORMAL ', 'StatusLineTerm', 'mode')
+        call g:StlSetPart(0, ' NORMAL ', 'StatusLineTerm', 'mode')
     elseif m == 'i'
-        call StlSetPart(0, ' INSERT ', 'SpellRare', 'mode')
+        call g:StlSetPart(0, ' INSERT ', 'SpellRare', 'mode')
     elseif m == 'v'
-        call StlSetPart(0, ' VISUAL ', 'SpellCap', 'mode')
+        call g:StlSetPart(0, ' VISUAL ', 'SpellCap', 'mode')
     elseif m == 'V'
-        call StlSetPart(0, ' V-LINE ', 'Visual', 'mode')
+        call g:StlSetPart(0, ' V-LINE ', 'Visual', 'mode')
     elseif m == '^V'
-        call StlSetPart(0, ' V-BLOCK ', 'CurSearch', 'mode')
+        call g:StlSetPart(0, ' V-BLOCK ', 'CurSearch', 'mode')
     endif
-    call StlRefresh()
+    call g:StlRefresh()
 endfunction
 
 " extension adds line column information
 function! s:lncol()
     let col = virtcol(".")
     let ln = line('.')
-    call StlSetPart(float2nr(&co * 0.9), ln.':'.col, '', 'linenr')
-    call StlRefresh()
+    call g:StlSetPart(float2nr(&co * 0.9), ln.':'.col, '', 'linenr')
+    call g:StlRefresh()
 endfunction
 
 augroup GlobalStl
