@@ -3,6 +3,16 @@
 A plugin implements a global statusline(like the one in neovim) in vim.
 
 (needs vim9 with patch 9.0.0036 to work perfectly, check using `:echo has('patch36')`. For other vim version the characters at win split positions on statusline will be blocked)
+## Install
+
+Using any plugin manager 
+
+```vim
+" for vim-plug
+Plug 'Donaldttt/vim-global-statusline'
+```
+
+or put it in vim's run time path.
 
 ## Options
 
