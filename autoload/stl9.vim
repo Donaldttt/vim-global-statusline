@@ -142,6 +142,12 @@ def GetHiTerm(group: string): dict<any>
               dict[splited[0]] = splited[1]
         endif
     endfor
+    if ! has_key(dict, 'guibg')
+        dict['guibg'] = 'NONE'
+    endif
+    if ! has_key(dict, 'ctermbg')
+        dict['ctermbg'] = 'NONE'
+    endif
     cache[group] = dict
     return dict
 enddef
@@ -187,25 +193,26 @@ def ApplyStls(winstls: dict<any>): void
         endif
         setwinvar(wid, '&stl', join(v['content'], ''))
     endfor
-
     if flag1 || flag2
         var defaultHi: dict<any> = GetHiTerm(stlbg)
         if flag1
             defaultHi[stlFixList[0]] = stlFixList[1]
             CopyHi('Statusline', defaultHi)
             CopyHi('StatuslineTerm', defaultHi)
-        else
+        endif
+        if flag2
             defaultHi[stlFixList[0]] = stlFixList[2]
             CopyHi('StatuslineNC', defaultHi)
             CopyHi('StatuslineTermNC', defaultHi)
         endif
     endif
+
 enddef
 
-# var ww: dict<any> = {}
-# def g:ReturnWinstl(): dict<any>
-#     return ww
-# enddef
+var ww: dict<any> = {}
+def g:ReturnWinstl(): dict<any>
+    return ww
+enddef
 
 # clear stl of other windows
 def ClearNonBottom(nonbottom: list<any>): void
@@ -229,7 +236,7 @@ export def SetStl(): void
     for obj in virtualstl_list
         AddToWinStl(obj['start'], obj['content'], obj['hi'], botwins, winstls)
     endfor
-
+    ww = winstls
     ApplyStls(winstls)
     ClearNonBottom(nonbottom)
 enddef
