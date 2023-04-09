@@ -142,12 +142,12 @@ def GetHiTerm(group: string): dict<any>
               dict[splited[0]] = splited[1]
         endif
     endfor
-    if ! has_key(dict, 'guibg')
-        dict['guibg'] = 'NONE'
-    endif
-    if ! has_key(dict, 'ctermbg')
-        dict['ctermbg'] = 'NONE'
-    endif
+
+    for item in ['guibg', 'ctermbg', 'term', 'cterm', 'guifg', 'ctermfg']
+        if ! has_key(dict, item)
+            dict[item] = 'NONE'
+        endif
+    endfor
     cache[group] = dict
     return dict
 enddef
