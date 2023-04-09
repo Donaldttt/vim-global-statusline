@@ -133,11 +133,15 @@ def GetHiTerm(group: string): dict<any>
         return cache[group]
     endif
     var output: string = execute('hi ' .. group)
-    var list: list<string> = split(output, '\s\+')
+    if stridx(output, 'links to') > 0
+        var higroup = matchstr(output, 'links.to.\?\zs\S\+\ze')
+        return GetHiTerm(higroup)
+    endif
+    var list: list<string> = split(output, '')
     var dict: dict<any> = {}
 
     for item in list
-        if match(item, '=') > 0
+        if stridx(item, '=') > 0
               var splited = split(item, '=')
               dict[splited[0]] = splited[1]
         endif
@@ -157,7 +161,11 @@ def CopyHi(hiname: string, terms: dict<any>): void
     for [k, v] in items(terms)
         str ..= ' ' .. k .. '=' .. v
     endfor
+    try
     execute(str)
+    catch
+    echom str
+    endtry
 enddef
 
 def ApplyStls(winstls: dict<any>): void
