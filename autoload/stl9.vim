@@ -119,19 +119,20 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
     endfor
 enddef
 
-var cache: dict<any> = {}
-def ClearCache(): void
-    cache = {}
-enddef
-augroup ClearCache
-    autocmd!
-    autocmd ColorScheme * call ClearCache()
-augroup END
+# var cache: dict<any> = {}
+# def ClearCache(): void
+#     cache = {}
+# enddef
+# augroup ClearCache
+#     autocmd!
+#     autocmd ColorScheme * call ClearCache()
+# augroup END
 
 def GetHiTerm(group: string): dict<any>
-    if has_key(cache, group)
-        return cache[group]
-    endif
+    # if has_key(cache, group)
+    #     echom cache[group]
+    #     return cache[group]
+    # endif
     var output: string = execute('hi ' .. group)
     if stridx(output, 'links to') > 0
         var higroup = matchstr(output, 'links.to.\?\zs\S\+\ze')
@@ -152,7 +153,8 @@ def GetHiTerm(group: string): dict<any>
             dict[item] = 'NONE'
         endif
     endfor
-    cache[group] = dict
+    # cache[group] = dict
+    # echom dict
     return dict
 enddef
 
