@@ -78,7 +78,7 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
                 padstr += [content, bgstr]
                 var pad = start - (w['start'] + used) > 0 ? start - (w['start'] + used) : 0
                 if pad > 0
-                    padstr = [bgstr, repeat(' ', pad)] + padstr
+                    padstr = [repeat(' ', pad)] + padstr
                 endif
 
                 var overlap: number = (w['start'] + used) - start
