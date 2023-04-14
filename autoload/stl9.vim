@@ -63,7 +63,8 @@ export def SetVirtualStl(start: number, content: string, highlight: string, id: 
 enddef
 
 def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>, winstls: dict<any> ): void
-    const width: number = strcharlen(content)
+    const width: number = strdisplaywidth(content)
+
     var padstr: list<string> = [bgstr]
     if chi != ''
         padstr = ['%#' .. chi .. '#']
@@ -85,7 +86,7 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
                 while overlap > 0 # overlapping
                     var last: string = remove(winstls[wid]['content'], -1)
 
-                    var l: number = strcharlen(last)
+                    var l: number = strdisplaywidth(last)
                     if l > 2 && last[0 : 1] != '%#' && l >= overlap
                         last = strcharpart(last, 0, l - overlap)
                         winstls[wid]['content']->add(last)
@@ -99,7 +100,7 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
                 endwhile
 
                 winstls[wid]['content'] += padstr
-                winstls[wid]['used'] += strcharlen(content) + pad
+                winstls[wid]['used'] += strdisplaywidth(content) + pad
             else
 
                 var first: string   = strcharpart(content, 0, winend - start)
@@ -119,20 +120,7 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
     endfor
 enddef
 
-# var cache: dict<any> = {}
-# def ClearCache(): void
-#     cache = {}
-# enddef
-# augroup ClearCache
-#     autocmd!
-#     autocmd ColorScheme * call ClearCache()
-# augroup END
-
 def GetHiTerm(group: string): dict<any>
-    # if has_key(cache, group)
-    #     echom cache[group]
-    #     return cache[group]
-    # endif
     var output: string = execute('hi ' .. group)
     if stridx(output, 'links to') > 0
         var higroup = matchstr(output, 'links.to.\?\zs\S\+\ze')
@@ -153,8 +141,6 @@ def GetHiTerm(group: string): dict<any>
             dict[item] = 'NONE'
         endif
     endfor
-    # cache[group] = dict
-    # echom dict
     return dict
 enddef
 
