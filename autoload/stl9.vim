@@ -76,7 +76,7 @@ def AddToWinStl(start: number, content: string, chi: string, botwins: list<any>,
             var used = winstls[wid]['used']
             if start + width <= winend
 
-                padstr += [content, bgstr]
+                padstr += [content]
                 var pad = start - (w['start'] + used) > 0 ? start - (w['start'] + used) : 0
                 if pad > 0
                     padstr = [repeat(' ', pad)] + padstr
